@@ -21,13 +21,16 @@ public class TasbihFragment extends Fragment {
     private FragmentTasbihBinding binding;
     private Vibrator vibrator;
     private int count = 0;
+    private int grandTotal = 0;
+    private final int GOAL = 33;
 
     private static final String PREFS_NAME = "TasbihPrefs";
     private static final String KEY_COUNT = "tasbihCount";
+    private static final String KEY_GRAND_TOTAL = "tasbihGrandTotal";
     private SharedPreferences sharedPreferences;
 
     public TasbihFragment() {
-
+        // Required empty public constructor
     }
 
     @Override
@@ -45,51 +48,95 @@ public class TasbihFragment extends Fragment {
         vibrator = (Vibrator) requireActivity().getSystemService(Context.VIBRATOR_SERVICE);
 
         loadCount();
-        updateCountText();
+        updateUI();
+
+        binding.circularProgressBar.setMax(GOAL);
+        binding.tvTasbihGoalText.setText("/ " + GOAL);
 
         binding.layoutTasbihMain.setOnClickListener(v -> {
             count++;
-            updateCountText();
-            vibrate();
+
+            if (count > GOAL) {
+                vibrateLong();
+                grandTotal += count - 1;
+                count = 0;
+            } else {
+                vibrateShort();
+            }
+            updateUI();
+            animateCountText();
         });
 
-        binding.btnTasbihReset.setOnClickListener(v -> {
+        binding.btnTasbihResetCount.setOnClickListener(v -> {
             count = 0;
-            updateCountText();
-            vibrate();
+            updateUI();
+            vibrateShort();
+        });
+
+        binding.btnTasbihLog.setOnClickListener(v -> {
+            if (count > 0) {
+                grandTotal += count;
+                count = 0;
+                updateUI();
+                vibrateLong();
+            }
+        });
+
+        binding.btnTasbihResetGrandTotal.setOnClickListener(v -> {
+            count = 0;
+            grandTotal = 0;
+            updateUI();
+            vibrateLong();
         });
     }
 
-    private void vibrate() {
+    private void vibrateShort() {
         if (vibrator != null && vibrator.hasVibrator()) {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-
                 vibrator.vibrate(VibrationEffect.createOneShot(50, VibrationEffect.DEFAULT_AMPLITUDE));
             } else {
-
                 vibrator.vibrate(50);
             }
         }
     }
 
-    private void updateCountText() {
+    private void vibrateLong() {
+        if (vibrator != null && vibrator.hasVibrator()) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                vibrator.vibrate(VibrationEffect.createOneShot(200, VibrationEffect.DEFAULT_AMPLITUDE));
+            } else {
+                vibrator.vibrate(200);
+            }
+        }
+    }
+
+    private void updateUI() {
         binding.tvTasbihCount.setText(String.valueOf(count));
+        binding.tvTasbihGrandTotal.setText(String.valueOf(grandTotal));
+        binding.circularProgressBar.setProgress(count); // Update progress bar
+    }
+
+    private void animateCountText() {
+        binding.tvTasbihCount.animate().scaleX(1.05f).scaleY(1.05f).setDuration(50).withEndAction(() ->
+                binding.tvTasbihCount.animate().scaleX(1.0f).scaleY(1.0f).setDuration(50).start()
+        ).start();
     }
 
     private void loadCount() {
-        count = sharedPreferences.getInt(KEY_COUNT, 0); // Default ke 0
+        count = sharedPreferences.getInt(KEY_COUNT, 0);
+        grandTotal = sharedPreferences.getInt(KEY_GRAND_TOTAL, 0);
     }
 
     private void saveCount() {
         SharedPreferences.Editor editor = sharedPreferences.edit();
         editor.putInt(KEY_COUNT, count);
+        editor.putInt(KEY_GRAND_TOTAL, grandTotal);
         editor.apply();
     }
 
     @Override
     public void onPause() {
         super.onPause();
-
         saveCount();
     }
 

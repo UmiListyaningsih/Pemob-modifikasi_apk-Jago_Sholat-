@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout
+<androidx.constraintlayout.widget.ConstraintLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/layout_tasbih_main"
     android:layout_width="match_parent"
@@ -10,34 +11,108 @@
     android:background="?android:attr/colorBackground"
     tools:context=".ui.tasbih.TasbihFragment">
 
-    <ImageButton
-        android:id="@+id/btn_tasbih_reset"
-        android:layout_width="56dp"
-        android:layout_height="56dp"
-        android:layout_alignParentEnd="true"
-        android:layout_alignParentTop="true"
-        android:layout_margin="16dp"
-        android:background="?android:attr/selectableItemBackgroundBorderless"
-        android:src="@drawable/ic_baseline_refresh_24px"
-        android:contentDescription="Reset" />
+    <LinearLayout
+        android:id="@+id/layout_buttons_top"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:padding="8dp"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
+
+        <ImageButton
+            android:id="@+id/btn_tasbih_reset_count"
+            android:layout_width="0dp"
+            android:layout_height="48dp"
+            android:layout_weight="1"
+            android:background="?android:attr/selectableItemBackgroundBorderless"
+            android:src="@drawable/ic_baseline_refresh_24px"
+            android:contentDescription="Reset Hitungan Sekarang" />
+
+        <ImageButton
+            android:id="@+id/btn_tasbih_log"
+            android:layout_width="0dp"
+            android:layout_height="48dp"
+            android:layout_weight="1"
+            android:background="?android:attr/selectableItemBackgroundBorderless"
+            android:src="@drawable/ic_baseline_add_24"
+            android:contentDescription="Tambah ke Total" />
+    </LinearLayout>
+
+    <ProgressBar
+        android:id="@+id/circular_progress_bar"
+        style="?android:attr/progressBarStyleHorizontal"
+        android:layout_width="280dp"
+        android:layout_height="280dp"
+        android:progressDrawable="@drawable/circular_progress_drawable"
+        android:background="@drawable/circular_progress_background"
+        android:max="33"
+        android:progress="0"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
         android:id="@+id/tv_tasbih_count"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_centerInParent="true"
         android:text="0"
-        android:textSize="120sp"
+        android:textSize="100sp"
         android:textStyle="bold"
-        android:textColor="?android:attr/textColorPrimary" />
+        android:textColor="?android:attr/textColorPrimary"
+        app:layout_constraintBottom_toBottomOf="@+id/circular_progress_bar"
+        app:layout_constraintEnd_toEndOf="@+id/circular_progress_bar"
+        app:layout_constraintStart_toStartOf="@+id/circular_progress_bar"
+        app:layout_constraintTop_toTopOf="@+id/circular_progress_bar" />
 
     <TextView
+        android:id="@+id/tv_tasbih_goal_text"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@id/tv_tasbih_count"
-        android:layout_centerHorizontal="true"
-        android:layout_marginTop="8dp"
-        android:text="Sentuh di mana saja untuk menghitung"
-        android:textSize="16sp" />
+        android:layout_marginTop="-24dp"
+        android:text="/ 33"
+        android:textSize="28sp"
+        android:textStyle="bold"
+        android:textColor="@color/Progress_Green"
+        app:layout_constraintBottom_toTopOf="@+id/tv_tasbih_count"
+        app:layout_constraintEnd_toEndOf="@+id/tv_tasbih_count"
+        app:layout_constraintStart_toStartOf="@+id/tv_tasbih_count" />
 
-</RelativeLayout>
+
+    <LinearLayout
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center"
+        android:padding="16dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
+
+        <ImageButton
+            android:id="@+id/btn_tasbih_reset_grand_total"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:layout_marginEnd="16dp"
+            android:background="?android:attr/selectableItemBackgroundBorderless"
+            android:src="@drawable/ic_baseline_delete_24"
+            android:contentDescription="Reset Total Keseluruhan" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Total: "
+            android:textSize="20sp" />
+
+        <TextView
+            android:id="@+id/tv_tasbih_grand_total"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="20sp"
+            android:textStyle="bold"
+            tools:text="999" />
+    </LinearLayout>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

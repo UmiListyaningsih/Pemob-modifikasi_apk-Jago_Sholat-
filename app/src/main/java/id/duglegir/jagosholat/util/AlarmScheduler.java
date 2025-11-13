@@ -8,6 +8,7 @@ import android.content.Intent;
 import android.os.Build;
 import android.util.Log;
 import java.util.Calendar;
+import id.duglegir.jagosholat.util.PrayerTimeStorage;
 
 public class AlarmScheduler {
 
@@ -38,11 +39,11 @@ public class AlarmScheduler {
     private static void schedulePrayerAlarm(Context context, String prayerName) {
         AlarmManager alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
 
-        long prayerTimeMillis = getPrayerTimeInMillis(prayerName);
+        long prayerTimeMillis = getPrayerTimeInMillis(context, prayerName, false);
 
         if (prayerTimeMillis <= System.currentTimeMillis()) {
 
-            prayerTimeMillis = getPrayerTimeInMillis(prayerName, true);
+            prayerTimeMillis = getPrayerTimeInMillis(context, prayerName, true);
         }
 
         Intent intent = new Intent(context, AlarmReceiver.class);
@@ -78,42 +79,40 @@ public class AlarmScheduler {
         }
     }
 
-    private static long getPrayerTimeInMillis(String prayerName) {
-        return getPrayerTimeInMillis(prayerName, false); // Default untuk hari ini
-    }
+    // -----------------------------------------------------------------
+    // GANTI FUNGSI LAMA ANDA DENGAN YANG BARU INI
+    // -----------------------------------------------------------------
+    private static long getPrayerTimeInMillis(Context context, String prayerName, boolean isForTomorrow) {
 
-    private static long getPrayerTimeInMillis(String prayerName, boolean isForTomorrow) {
-        JadwalHelper helper = new JadwalHelper();
-        int totalSeconds;
+        // === INI ADALAH INTEGRASI DENGAN PENYIMPANAN BARU ===
+        // 1. Ambil waktu (format "HH:mm") dari SharedPreferences
+        String timeString = PrayerTimeStorage.getPrayerTime(context, prayerName);
 
-        switch (prayerName) {
-            case "Subuh": totalSeconds = helper.getJmlWaktuShubuh(); break;
-            case "Dzuhur": totalSeconds = helper.getJmlWaktuDzuhur(); break;
-            case "Ashar": totalSeconds = helper.getJmlWaktuAshar(); break;
-            case "Maghrib": totalSeconds = helper.getJmlWaktuMaghrib(); break;
-            case "Isya": totalSeconds = helper.getJmlWaktuIsya(); break;
-            default: totalSeconds = 0;
-        }
-
-
-        if (totalSeconds == 0) {
-            Log.e("AlarmScheduler", "Waktu sholat " + prayerName + " tidak ditemukan oleh JadwalHelper.");
+        // Jika penyimpanan kosong (misal: "00:00"), jangan set alarm
+        if (timeString.equals("00:00")) {
+            Log.e("AlarmScheduler", "Waktu sholat " + prayerName + " tidak ditemukan di Storage.");
             return 0; // Waktu tidak valid
         }
 
         try {
+            // 2. Parsing "HH:mm"
+            String[] parts = timeString.split(":");
+            int hour = Integer.parseInt(parts[0]);
+            int minute = Integer.parseInt(parts[1]);
 
+            // 3. Konversi ke Objek Kalender
             Calendar calendar = Calendar.getInstance();
             calendar.setTimeInMillis(System.currentTimeMillis());
-            calendar.set(Calendar.HOUR_OF_DAY, totalSeconds / 3600); // 3600 detik/jam
-            calendar.set(Calendar.MINUTE, (totalSeconds % 3600) / 60); // sisa detik / 60
+            calendar.set(Calendar.HOUR_OF_DAY, hour);
+            calendar.set(Calendar.MINUTE, minute);
             calendar.set(Calendar.SECOND, 0);
             calendar.set(Calendar.MILLISECOND, 0);
 
+            // Jika untuk besok
             if (isForTomorrow) {
                 calendar.add(Calendar.DAY_OF_YEAR, 1);
             }
-
+            // Jika waktu hari ini sudah lewat, otomatis set untuk besok
             else if (calendar.getTimeInMillis() <= System.currentTimeMillis()) {
                 calendar.add(Calendar.DAY_OF_YEAR, 1);
             }
@@ -125,6 +124,15 @@ public class AlarmScheduler {
             return 0; // Waktu tidak valid
         }
     }
+
+    // Overload method agar 'getPrayerTimeInMillis(prayerName)' tetap berfungsi
+    private static long getPrayerTimeInMillis(String prayerName) {
+        // Ini adalah kesalahan, method ini butuh Context.
+        // Kita harus perbaiki pemanggilan di 'schedulePrayerAlarm'
+        Log.e("AlarmScheduler", "Pemanggilan salah, butuh context!");
+        return 0;
+    }
+    // -----------------------------------------------------------------
 
 
     private static int getRequestCode(String prayerName) {

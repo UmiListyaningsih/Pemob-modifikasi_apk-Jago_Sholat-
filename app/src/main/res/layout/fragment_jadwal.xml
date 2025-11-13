@@ -13,6 +13,15 @@
         android:orientation="vertical"
         android:paddingVertical="10dp">
         <TextView
+            android:id="@+id/tv_lokasi"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="8dp"
+            android:text="Mencari lokasi..."
+            android:textSize="18sp"
+            android:textStyle="bold" />
+
+        <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/mendatang"
