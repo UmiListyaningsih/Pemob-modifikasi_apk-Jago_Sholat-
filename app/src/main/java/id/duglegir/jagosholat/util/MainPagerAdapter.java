@@ -8,6 +8,7 @@ import androidx.viewpager2.adapter.FragmentStateAdapter;
 import id.duglegir.jagosholat.ui.compass.Kompas2Fragment;
 import id.duglegir.jagosholat.ui.main.JadwalFragment;
 import id.duglegir.jagosholat.ui.main.CatatanFragment;
+import id.duglegir.jagosholat.ui.tasbih.TasbihFragment;
 import id.duglegir.jagosholat.ui.tutorial.FeatureFragment;
 import id.duglegir.jagosholat.ui.statistic.StatistikFragment;
 
@@ -30,6 +31,8 @@ public class MainPagerAdapter extends FragmentStateAdapter {
             case 3 :
                 return new Kompas2Fragment();
             case 4 :
+                return new TasbihFragment();
+            case 5 :
                 return new FeatureFragment();
             default:
                 return new Fragment();
@@ -39,6 +42,6 @@ public class MainPagerAdapter extends FragmentStateAdapter {
     // GANTI getCount() MENJADI getItemCount()
     @Override
     public int getItemCount() {
-        return 5; // Kembalikan jumlah tab Anda secara langsung
+        return 6; // Kembalikan jumlah tab Anda secara langsung
     }
 }

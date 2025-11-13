@@ -15,7 +15,6 @@ public class AlarmScheduler {
     // KITA ASUMSIKAN NAMA JADWAL SHOLAT ANDA
     private static final String[] PRAYER_NAMES = {"Subuh", "Dzuhur", "Ashar", "Maghrib", "Isya"};
 
-    // Panggil ini untuk menjadwalkan SEMUA alarm
     public static void scheduleAlarms(Context context) {
         for (String prayerName : PRAYER_NAMES) {
             schedulePrayerAlarm(context, prayerName);

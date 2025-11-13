@@ -38,8 +38,8 @@ public class MainActivity extends AppCompatActivity {
     private int resID;
 
     // Deklarasi Judul & Ikon (Tetap sama)
-    private String[] pageTitle = {"Catatan", "Jadwal", "Statistik", "Kompas", "Tata Cara"};
-    private String[] pageIcon = {"catat", "jadwal", "statistik", "kompas", "more"};
+    private String[] pageTitle = {"Catatan", "Jadwal", "Statistik", "Kompas", "Tasbih", "Tata Cara"};
+    private String[] pageIcon = {"catat", "jadwal", "statistik", "kompas", "tasbih", "more"};
 
     private final ActivityResultLauncher<String> requestNotificationPermissionLauncher =
             registerForActivityResult(new ActivityResultContracts.RequestPermission(), isGranted -> {
