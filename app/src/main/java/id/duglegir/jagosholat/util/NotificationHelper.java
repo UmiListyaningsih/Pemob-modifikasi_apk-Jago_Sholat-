@@ -1,4 +1,4 @@
-package id.duglegir.jagosholat.util; // Pastikan package Anda benar
+package id.duglegir.jagosholat.util; 
 
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
@@ -23,7 +23,6 @@ public class NotificationHelper {
         this.mContext = context;
     }
 
-    // 1. Membuat Channel (Wajib untuk Android 8+)
     public void createNotificationChannel() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             NotificationChannel channel = new NotificationChannel(
@@ -39,27 +38,24 @@ public class NotificationHelper {
         }
     }
 
-    // 2. Membuat dan Menampilkan Notifikasi
     public void showNotification(String title, String message) {
-        // Buat Intent untuk membuka MainActivity saat notifikasi di-klik
+
         Intent intent = new Intent(mContext, MainActivity.class);
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
         PendingIntent pendingIntent = PendingIntent.getActivity(mContext, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
 
-        // Buat Notifikasi
         NotificationCompat.Builder builder = new NotificationCompat.Builder(mContext, CHANNEL_ID)
-                .setSmallIcon(R.drawable.ic_logo_jago_sholat) // GANTI DENGAN IKON ANDA
+                .setSmallIcon(R.drawable.ic_logo_jago_sholat)
                 .setContentTitle(title)
                 .setContentText(message)
                 .setPriority(NotificationCompat.PRIORITY_HIGH)
                 .setContentIntent(pendingIntent)
                 .setAutoCancel(true)
-                .setVibrate(new long[]{1000, 1000, 1000, 1000, 1000}); // Pola getar
+                .setVibrate(new long[]{1000, 1000, 1000, 1000, 1000});
 
         NotificationManager notificationManager = (NotificationManager) mContext.getSystemService(Context.NOTIFICATION_SERVICE);
 
-        // Tampilkan notifikasi
-        // (Kita gunakan ID 1 agar notifikasi saling menimpa, bukan menumpuk)
+
         notificationManager.notify(1, builder.build());
     }
 }

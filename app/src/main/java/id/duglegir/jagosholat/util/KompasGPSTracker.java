@@ -1,28 +1,23 @@
 package id.duglegir.jagosholat.util;
 
-import android.Manifest; // Import baru
+import android.Manifest;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import androidx.annotation.NonNull;
 import android.content.Intent;
-import android.content.pm.PackageManager; // Import baru
+import android.content.pm.PackageManager;
 import android.location.Location;
-import android.location.LocationListener; // Import baru
+import android.location.LocationListener;
 import android.location.LocationManager;
-import android.os.Bundle; // Import baru
+import android.os.Bundle;
 import android.provider.Settings;
 import android.util.Log;
 
-import androidx.core.content.ContextCompat; // Import baru
+import androidx.core.content.ContextCompat;
 
-/**
- * Created by Bryan on 3/20/2018.
- * DIMODIFIKASI: Dihapus 'extends Service' dan 'implements LocationListener'
- * untuk dijadikan helper class biasa (POJO).
- */
 
-// HAPUS 'extends Service implements LocationListener'
+
 public class KompasGPSTracker {
 
     private final Context mContext;
@@ -34,13 +29,12 @@ public class KompasGPSTracker {
     double latitude;
     double longitude;
 
-    // Kita tidak akan meminta update aktif, jadi konstanta ini bisa diabaikan
-    // private static final long MIN_DISTANCE_CHANGE_FOR_UPDATES = 10;
-    // private static final long MIN_TIME_BW_UPDATES = 1000 * 60 * 1;
+
+
 
     public KompasGPSTracker(Context context) {
         this.mContext = context;
-        // Hapus pemanggilan getLocation() dari constructor agar lebih aman
+
     }
 
     public Location getLocation() {
@@ -54,12 +48,11 @@ public class KompasGPSTracker {
             isNetworkEnabled = locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER);
 
             if (!isGPSEnabled && !isNetworkEnabled) {
-                // tidak ada provider lokasi
+
                 this.canGetLocation = false;
             } else {
                 this.canGetLocation = true;
 
-                // Periksa izin (Wajib)
                 if (ContextCompat.checkSelfPermission(mContext, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED &&
                         ContextCompat.checkSelfPermission(mContext, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
 
@@ -68,10 +61,9 @@ public class KompasGPSTracker {
                     return null;
                 }
 
-                // Dapatkan lokasi dari Network Provider dulu
                 if (isNetworkEnabled) {
                     try {
-                        // Minta satu kali update pasif (ini tidak memerlukan 'implements LocationListener')
+
                         locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 0, 0, new LocationListener() {
                             @Override public void onLocationChanged(@NonNull Location location) {}
                             @Override public void onProviderDisabled(@NonNull String provider) {}
@@ -91,7 +83,6 @@ public class KompasGPSTracker {
                     }
                 }
 
-                // Jika gagal, dapatkan dari GPS Provider
                 if (isGPSEnabled) {
                     if (location == null) { // Hanya jika lokasi masih null
                         try {
@@ -136,7 +127,7 @@ public class KompasGPSTracker {
     }
 
     public boolean canGetLocation() {
-        // Perbarui status sebelum mengembalikan
+
         if (locationManager == null) {
             locationManager = (LocationManager) mContext.getSystemService(Context.LOCATION_SERVICE);
         }
@@ -164,10 +155,9 @@ public class KompasGPSTracker {
         alertDialog.show();
     }
 
-    // Hapus semua method override yang berhubungan dengan Service dan LocationListener
-    // @Override public void onLocationChanged(Location location) {}
-    // @Override public void onProviderDisabled(String provider) {}
-    // @Override public void onProviderEnabled(String provider) {}
-    // @Override public void onStatusChanged(String provider, int status, Bundle extras) {}
-    // @Override public IBinder onBind(Intent arg0) { return null; }
+
+
+
+
+
 }

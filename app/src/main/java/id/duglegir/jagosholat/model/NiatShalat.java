@@ -1,8 +1,6 @@
 package id.duglegir.jagosholat.model;
 
-/**
- * Created by Bryan on 3/3/2018.
- */
+
 
 public class NiatShalat {
 

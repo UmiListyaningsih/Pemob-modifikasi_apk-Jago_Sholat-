@@ -6,54 +6,47 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.TimeZone;
 
-/**
- * Created by M. Ikhsan Ramadhan
- * =========================================
- * JagoSholat
- * Copyright (C) 17/04/2018.
- * All rights reserved
- * -----------------------------------------
- */
+
 public class WaktuShalatHelper {
-    // ---------------------- Global Variables --------------------
-    private int calcMethod; // caculation method
-    private int asrJuristic; // Juristic method for Asr
-    private int dhuhrMinutes; // minutes after mid-day for Dhuhr
-    private int adjustHighLats; // adjusting method for higher latitudes
-    private int timeFormat; // time format
-    private double lat; // latitude
-    private double lng; // longitude
-    private double timeZone; // time-zone
-    private double JDate; // Julian date
-    // ------------------------------------------------------------
-    // Calculation Methods
-    public int Jafari; // Ithna Ashari
-    public int Karachi; // University of Islamic Sciences, Karachi
-    public int ISNA; // Islamic Society of North America (ISNA)
-    public int MWL; // Muslim World League (MWL)
-    public int Makkah; // Umm al-Qura, Makkah
-    public int Egypt; // Egyptian General Authority of Survey
-    public int Custom; // Custom Setting
-    public int Tehran; // Institute of Geophysics, University of Tehran
-    // Juristic Methods
-    public int Shafii; // Shafii (standard)
-    public int Hanafi; // Hanafi
-    // Adjusting Methods for Higher Latitudes
-    public int None; // No adjustment
-    public int MidNight; // middle of night
-    public int OneSeventh; // 1/7th of night
-    public int AngleBased; // angle/60th of night
-    // Time Formats
-    public int Time24; // 24-hour format
-    public int Time12; // 12-hour format
-    public int Time12NS; // 12-hour format with no suffix
-    public int Floating; // floating point number
-    // Time Names
+
+    private int calcMethod;
+    private int asrJuristic;
+    private int dhuhrMinutes;
+    private int adjustHighLats;
+    private int timeFormat;
+    private double lat;
+    private double lng;
+    private double timeZone;
+    private double JDate;
+
+
+    public int Jafari;
+    public int Karachi;
+    public int ISNA;
+    public int MWL;
+    public int Makkah;
+    public int Egypt;
+    public int Custom;
+    public int Tehran;
+
+    public int Shafii;
+    public int Hanafi;
+
+    public int None;
+    public int MidNight;
+    public int OneSeventh;
+    public int AngleBased;
+
+    public int Time24;
+    public int Time12;
+    public int Time12NS;
+    public int Floating;
+
     private ArrayList<String> timeNames;
-    private String InvalidTime; // The string used for invalid times
-    // --------------------- Technical Settings --------------------
-    private int numIterations; // number of iterations needed to compute times
-    // ------------------- Calc Method Parameters --------------------
+    private String InvalidTime;
+
+    private int numIterations;
+
     private HashMap<Integer, double[]> methodParams;
 
     private double[] prayerTimesCurrent;
@@ -66,33 +59,28 @@ public class WaktuShalatHelper {
         this.setAdjustHighLats(1);
         this.setTimeFormat(0);
 
-// Calculation Methods
-        this.setJafari(0); // Ithna Ashari
-        this.setKarachi(1); // University of Islamic Sciences, Karachi
-        this.setISNA(2); // Islamic Society of North America (ISNA)
-        this.setMWL(3); // Muslim World League (MWL)
-        this.setMakkah(4); // Umm al-Qura, Makkah
-        this.setEgypt(5); // Egyptian General Authority of Survey
-        this.setTehran(6); // Institute of Geophysics, University of Tehran
-        this.setCustom(7); // Custom Setting
+        this.setJafari(0);
+        this.setKarachi(1);
+        this.setISNA(2);
+        this.setMWL(3);
+        this.setMakkah(4);
+        this.setEgypt(5);
+        this.setTehran(6);
+        this.setCustom(7);
 
-        // Juristic Methods
-        this.setShafii(0); // Shafii (standard)
-        this.setHanafi(1); // Hanafi
+        this.setShafii(0);
+        this.setHanafi(1);
 
-// Adjusting Methods for Higher Latitudes
-        this.setNone(0); // No adjustment
-        this.setMidNight(1); // middle of night
-        this.setOneSeventh(2); // 1/7th of night
-        this.setAngleBased(3); // angle/60th of night
+        this.setNone(0);
+        this.setMidNight(1);
+        this.setOneSeventh(2);
+        this.setAngleBased(3);
 
-// Time Formats
-        this.setTime24(0); // 24-hour format
-        this.setTime12(1); // 12-hour format
-        this.setTime12NS(2); // 12-hour format with no suffix
-        this.setFloating(3); // floating point number
+        this.setTime24(0);
+        this.setTime12(1);
+        this.setTime12NS(2);
+        this.setFloating(3);
 
-// Time Names
         timeNames = new ArrayList<String>();
         timeNames.add("Shubuh");
         timeNames.add("Matahari Terbit");
@@ -102,16 +90,13 @@ public class WaktuShalatHelper {
         timeNames.add("Maghrib");
         timeNames.add("Isya");
 
-        InvalidTime = "-----"; // The string used for invalid times
+        InvalidTime = "-----";
 
-// --------------------- Technical Settings --------------------
 
-        this.setNumIterations(1); // number of iterations needed to compute
-        // times
+        this.setNumIterations(1);
 
-// ------------------- Calc Method Parameters --------------------
 
-// Tuning offsets {fajr, sunrise, dhuhr, asr, sunset, maghrib, isha}
+
         offsets = new int[7];
         offsets[0] = 0;
         offsets[1] = 0;
@@ -123,41 +108,32 @@ public class WaktuShalatHelper {
 
         methodParams = new HashMap<Integer, double[]>();
 
-        // Jafari
         double[] Jvalues = { 16, 0, 4, 0, 14 };
         methodParams.put(Integer.valueOf(this.getJafari()), Jvalues);
 
-// Karachi
         double[] Kvalues = { 18, 1, 0, 0, 18 };
         methodParams.put(Integer.valueOf(this.getKarachi()), Kvalues);
 
-// ISNA
         double[] Ivalues = { 15, 1, 0, 0, 15 };
         methodParams.put(Integer.valueOf(this.getISNA()), Ivalues);
 
-// MWL
         double[] MWvalues = { 18, 1, 0, 0, 17 };
         methodParams.put(Integer.valueOf(this.getMWL()), MWvalues);
 
-// Makkah
         double[] MKvalues = { 18.5, 1, 0, 1, 90 };
         methodParams.put(Integer.valueOf(this.getMakkah()), MKvalues);
 
-// Egypt
         double[] Evalues = { 19.5, 1, 0, 0, 17.5 };
         methodParams.put(Integer.valueOf(this.getEgypt()), Evalues);
 
-// Tehran
         double[] Tvalues = { 17.7, 0, 4.5, 0, 14 };
         methodParams.put(Integer.valueOf(this.getTehran()), Tvalues);
 
-// Custom
         double[] Cvalues = { 18, 1, 0, 0, 17 };
         methodParams.put(Integer.valueOf(this.getCustom()), Cvalues);
     }
 
-    // ---------------------- Trigonometric Functions -----------------------
-    // range reduce angle in degrees.
+
     private double fixangle(double a) {
 
         a = a - (360 * (Math.floor(a / 360.0)));
@@ -167,77 +143,64 @@ public class WaktuShalatHelper {
         return a;
     }
 
-    // range reduce hours to 0..23
     private double fixhour(double a) {
         a = a - 24.0 * Math.floor(a / 24.0);
         a = a < 0 ? (a + 24) : a;
         return a;
     }
 
-    // radian to degree
     private double radiansToDegrees(double alpha) {
         return ((alpha * 180.0) / Math.PI);
     }
 
-    // deree to radian
     private double DegreesToRadians(double alpha) {
         return ((alpha * Math.PI) / 180.0);
     }
 
-    // degree sin
     private double dsin(double d) {
         return (Math.sin(DegreesToRadians(d)));
     }
 
-    // degree cos
     private double dcos(double d) {
         return (Math.cos(DegreesToRadians(d)));
     }
 
-    // degree tan
     private double dtan(double d) {
         return (Math.tan(DegreesToRadians(d)));
     }
 
-    // degree arcsin
     private double darcsin(double x) {
         double val = Math.asin(x);
         return radiansToDegrees(val);
     }
 
-    // degree arccos
     private double darccos(double x) {
         double val = Math.acos(x);
         return radiansToDegrees(val);
     }
 
-    // degree arctan
     private double darctan(double x) {
         double val = Math.atan(x);
         return radiansToDegrees(val);
     }
 
-    // degree arctan2
     private double darctan2(double y, double x) {
         double val = Math.atan2(y, x);
         return radiansToDegrees(val);
     }
 
-    // degree arccot
     private double darccot(double x) {
         double val = Math.atan2(1.0, x);
         return radiansToDegrees(val);
     }
 
-    // ---------------------- Time-Zone Functions -----------------------
-    // compute local time-zone for a specific date
+
     private double getTimeZone1() {
         TimeZone timez = TimeZone.getDefault();
         double hoursDiff = (timez.getRawOffset() / 1000.0) / 3600;
         return hoursDiff;
     }
 
-    // compute base time-zone of the system
     private double getBaseTimeZone() {
         TimeZone timez = TimeZone.getDefault();
         double hoursDiff = (timez.getRawOffset() / 1000.0) / 3600;
@@ -245,15 +208,13 @@ public class WaktuShalatHelper {
 
     }
 
-    // detect daylight saving in a given date
     private double detectDaylightSaving() {
         TimeZone timez = TimeZone.getDefault();
         double hoursDiff = timez.getDSTSavings();
         return hoursDiff;
     }
 
-    // ---------------------- Julian Date Functions -----------------------
-    // calculate julian date from a calendar date
+
     private double julianDate(int year, int month, int day) {
 
         if (month <= 2) {
@@ -270,23 +231,21 @@ public class WaktuShalatHelper {
         return JD;
     }
 
-    // convert a calendar date to julian date (second method)
     private double calcJD(int year, int month, int day) {
         double J1970 = 2440588.0;
         Date date = new Date(year, month - 1, day);
 
-        double ms = date.getTime(); // # of milliseconds since midnight Jan 1,
-        // 1970
+        double ms = date.getTime();
+
         double days = Math.floor(ms / (1000.0 * 60.0 * 60.0 * 24.0));
         return J1970 + days - 0.5;
 
     }
 
-    // ---------------------- Calculation Functions -----------------------
-    // References:
-    // http://www.ummah.net/astronomy/saltime
-    // http://aa.usno.navy.mil/faq/docs/SunApprox.html
-    // compute declination angle of sun and equation of time
+
+
+
+
     private double[] sunPosition(double jd) {
 
         double D = jd - 2451545;
@@ -294,8 +253,7 @@ public class WaktuShalatHelper {
         double q = fixangle(280.459 + 0.98564736 * D);
         double L = fixangle(q + (1.915 * dsin(g)) + (0.020 * dsin(2 * g)));
 
-// double R = 1.00014 - 0.01671 * [self dcos:g] - 0.00014 * [self dcos:
-        // (2*g)];
+
         double e = 23.439 - (0.00000036 * D);
         double d = darcsin(dsin(e) * dsin(L));
         double RA = (darctan2((dcos(e) * dsin(L)), (dcos(L)))) / 15.0;
@@ -308,26 +266,22 @@ public class WaktuShalatHelper {
         return sPosition;
     }
 
-    // compute equation of time
     private double equationOfTime(double jd) {
         double eq = sunPosition(jd)[1];
         return eq;
     }
 
-    // compute declination angle of sun
     private double sunDeclination(double jd) {
         double d = sunPosition(jd)[0];
         return d;
     }
 
-    // compute mid-day (Dhuhr, Zawal) time
     private double computeMidDay(double t) {
         double T = equationOfTime(this.getJDate() + t);
         double Z = fixhour(12 - T);
         return Z;
     }
 
-    // compute time for a given angle G
     private double computeTime(double G, double t) {
 
         double D = sunDeclination(this.getJDate() + t);
@@ -339,22 +293,19 @@ public class WaktuShalatHelper {
         return Z + (G > 90 ? -V : V);
     }
 
-    // compute the time of Asr
-    // Shafii: step=1, Hanafi: step=2
+
     private double computeAsr(double step, double t) {
         double D = sunDeclination(this.getJDate() + t);
         double G = -darccot(step + dtan(Math.abs(this.getLat() - D)));
         return computeTime(G, t);
     }
 
-    // ---------------------- Misc Functions -----------------------
-    // compute the difference between two times
+
     private double timeDiff(double time1, double time2) {
         return fixhour(time2 - time1);
     }
 
-    // -------------------- Interface Functions --------------------
-    // return prayer times for a given date
+
     private ArrayList<String> getDatePrayerTimes(int year, int month, int day,
                                                  double latitude, double longitude, double tZone) {
         this.setLat(latitude);
@@ -366,7 +317,6 @@ public class WaktuShalatHelper {
         return computeDayTimes();
     }
 
-    // return prayer times for a given date
     public ArrayList<String> getPrayerTimes(Calendar date, double latitude,
                                             double longitude, double tZone) {
 
@@ -378,7 +328,6 @@ public class WaktuShalatHelper {
                 tZone);
     }
 
-    // set custom values for calculation parameters
     private void setCustomParams(double[] params) {
 
         for (int i = 0; i < 5; i++) {
@@ -392,41 +341,35 @@ public class WaktuShalatHelper {
         this.setCalcMethod(this.getCustom());
     }
 
-    // set the angle for calculating Fajr
     public void setFajrAngle(double angle) {
         double[] params = { angle, -1, -1, -1, -1 };
         setCustomParams(params);
     }
 
-    // set the angle for calculating Maghrib
     public void setMaghribAngle(double angle) {
         double[] params = { -1, 0, angle, -1, -1 };
         setCustomParams(params);
 
     }
 
-    // set the angle for calculating Isha
     public void setIshaAngle(double angle) {
         double[] params = { -1, -1, -1, 0, angle };
         setCustomParams(params);
 
     }
 
-    // set the minutes after Sunset for calculating Maghrib
     public void setMaghribMinutes(double minutes) {
         double[] params = { -1, 1, minutes, -1, -1 };
         setCustomParams(params);
 
     }
 
-    // set the minutes after Maghrib for calculating Isha
     public void setIshaMinutes(double minutes) {
         double[] params = { -1, -1, -1, 1, minutes };
         setCustomParams(params);
 
     }
 
-    // convert double hours to 24h format
     public String floatToTime24(double time) {
 
         String result;
@@ -435,7 +378,7 @@ public class WaktuShalatHelper {
             return InvalidTime;
         }
 
-        time = fixhour(time + 0.5 / 60.0); // add 0.5 minutes to round
+        time = fixhour(time + 0.5 / 60.0);
         int hours = (int) Math.floor(time);
         double minutes = Math.floor((time - hours) * 60.0);
 
@@ -451,14 +394,13 @@ public class WaktuShalatHelper {
         return result;
     }
 
-    // convert double hours to 12h format
     public String floatToTime12(double time, boolean noSuffix) {
 
         if (Double.isNaN(time)) {
             return InvalidTime;
         }
 
-        time = fixhour(time + 0.5 / 60); // add 0.5 minutes to round
+        time = fixhour(time + 0.5 / 60);
         int hours = (int) Math.floor(time);
         double minutes = Math.floor((time - hours) * 60);
         String suffix, result;
@@ -468,9 +410,7 @@ public class WaktuShalatHelper {
             suffix = "am";
         }
         hours = ((((hours + 12) - 1) % (12)) + 1);
-        /*
-         * hours = (hours + 12) - 1; int hrs = (int) hours % 12; hrs += 1;
-         */
+        
         if (noSuffix == false) {
             if ((hours >= 0 && hours <= 9) && (minutes >= 0 && minutes <= 9)) {
                 result = "0" + hours + " : 0" + Math.round(minutes) + " "
@@ -498,13 +438,11 @@ public class WaktuShalatHelper {
 
     }
 
-    // convert double hours to 12h format with no suffix
     public String floatToTime12NS(double time) {
         return floatToTime12(time, true);
     }
 
-    // ---------------------- Compute Prayer Times -----------------------
-    // compute prayer times at given julian date
+
     private double[] computeTimes(double[] times) {
 
         double[] t = dayPortion(times);
@@ -529,9 +467,8 @@ public class WaktuShalatHelper {
 
     }
 
-    // compute prayer times at given julian date
     private ArrayList<String> computeDayTimes() {
-        double[] times = { 5, 6, 12, 13, 18, 18, 18 }; // default times
+        double[] times = { 5, 6, 12, 13, 18, 18, 18 };
 
         for (int i = 1; i <= this.getNumIterations(); i++) {
             times = computeTimes(times);
@@ -543,19 +480,18 @@ public class WaktuShalatHelper {
         return adjustTimesFormat(times);
     }
 
-    // adjust times in a prayer time array
     private double[] adjustTimes(double[] times) {
         for (int i = 0; i < times.length; i++) {
             times[i] += this.getTimeZone() - this.getLng() / 15;
         }
 
-        times[2] += this.getDhuhrMinutes() / 60; // Dhuhr
-        if (methodParams.get(this.getCalcMethod())[1] == 1) // Maghrib
+        times[2] += this.getDhuhrMinutes() / 60;
+        if (methodParams.get(this.getCalcMethod())[1] == 1)
         {
             times[5] = times[4] + methodParams.get(this.getCalcMethod())[2]
                     / 60;
         }
-        if (methodParams.get(this.getCalcMethod())[3] == 1) // Isha
+        if (methodParams.get(this.getCalcMethod())[3] == 1)
         {
             times[6] = times[5] + methodParams.get(this.getCalcMethod())[4]
                     / 60;
@@ -568,7 +504,6 @@ public class WaktuShalatHelper {
         return times;
     }
 
-    // convert times array to given time format
     private ArrayList<String> adjustTimesFormat(double[] times) {
 
         ArrayList<String> result = new ArrayList<String>();
@@ -592,11 +527,9 @@ public class WaktuShalatHelper {
         return result;
     }
 
-    // adjust Fajr, Isha and Maghrib for locations in higher latitudes
     private double[] adjustHighLatTimes(double[] times) {
-        double nightTime = timeDiff(times[4], times[1]); // sunset to sunrise
+        double nightTime = timeDiff(times[4], times[1]);
 
-// Adjust Fajr
         double FajrDiff = nightPortion(methodParams.get(this.getCalcMethod())[0])
                 * nightTime;
 
@@ -604,7 +537,6 @@ public class WaktuShalatHelper {
             times[0] = times[1] - FajrDiff;
         }
 
-// Adjust Isha
         double IshaAngle = (methodParams.get(this.getCalcMethod())[3] == 0) ? methodParams
                 .get(this.getCalcMethod())[4] : 18;
         double IshaDiff = this.nightPortion(IshaAngle) * nightTime;
@@ -613,7 +545,6 @@ public class WaktuShalatHelper {
             times[6] = times[4] + IshaDiff;
         }
 
-// Adjust Maghrib
         double MaghribAngle = (methodParams.get(this.getCalcMethod())[1] == 0) ? methodParams
                 .get(this.getCalcMethod())[2] : 4;
         double MaghribDiff = nightPortion(MaghribAngle) * nightTime;
@@ -625,7 +556,6 @@ public class WaktuShalatHelper {
         return times;
     }
 
-    // the night portion used for adjusting times in higher latitudes
     private double nightPortion(double angle) {
         double calc = 0;
 
@@ -639,7 +569,6 @@ public class WaktuShalatHelper {
         return calc;
     }
 
-    // convert hours to day portions
     private double[] dayPortion(double[] times) {
         for (int i = 0; i < 7; i++) {
             times[i] /= 24;
@@ -647,15 +576,14 @@ public class WaktuShalatHelper {
         return times;
     }
 
-    // Tune timings for adjustments
-    // Set time offsets
+
     public void tune(int[] offsetTimes) {
 
-        for (int i = 0; i < offsetTimes.length; i++) { // offsetTimes length
-            // should be 7 in order
-            // of Fajr, Sunrise,
-            // Dhuhr, Asr, Sunset,
-            // Maghrib, Isha
+        for (int i = 0; i < offsetTimes.length; i++) {
+
+
+
+
             this.offsets[i] = offsetTimes[i];
         }
     }

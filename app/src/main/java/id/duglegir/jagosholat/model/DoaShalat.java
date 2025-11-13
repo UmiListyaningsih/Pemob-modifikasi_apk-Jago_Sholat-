@@ -1,8 +1,6 @@
 package id.duglegir.jagosholat.model;
 
-/**
- * Created by Bryan on 3/12/2018.
- */
+
 
 public class DoaShalat {
     private String arabDoa, latinDoa, terjemahDoa;

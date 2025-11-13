@@ -43,7 +43,6 @@ public class KompasFragment extends Fragment implements SensorEventListener {
     private KompasGPSTracker gps;
     private SensorManager sensorManager;
 
-    // Sensor Baru
     private Sensor accelerometer;
     private Sensor magnetometer;
     private float[] gravity = new float[3];
@@ -55,31 +54,29 @@ public class KompasFragment extends Fragment implements SensorEventListener {
     private double Qlongi = 39.82624;
     public static double degree;
 
-    // =====================================================================
-    //  LANGKAH 1: Definisikan "Peluncur Permintaan Izin" (Cara Modern)
-    // =====================================================================
+
+
     private final ActivityResultLauncher<String[]> requestPermissionLauncher =
             registerForActivityResult(new ActivityResultContracts.RequestMultiplePermissions(), (Map<String, Boolean> isGrantedMap) -> {
 
-                // Cek apakah kedua izin diberikan
                 boolean fineLocationGranted = isGrantedMap.getOrDefault(Manifest.permission.ACCESS_FINE_LOCATION, false);
                 boolean coarseLocationGranted = isGrantedMap.getOrDefault(Manifest.permission.ACCESS_COARSE_LOCATION, false);
 
                 if (fineLocationGranted && coarseLocationGranted) {
-                    // Izin DIBERIKAN. Lanjutkan memuat kompas.
+
                     initializeKompas();
                 } else {
-                    // Izin DITOLAK. Tampilkan pesan.
+
                     Toast.makeText(requireContext(), "Izin lokasi ditolak. Kompas tidak dapat berfungsi.", Toast.LENGTH_LONG).show();
                     if (binding != null) {
                         binding.idTvCountryName.setText("Izin lokasi ditolak");
                     }
                 }
             });
-    // =====================================================================
+
 
     public KompasFragment() {
-        // Required empty public constructor
+
     }
 
     @Override
@@ -93,39 +90,35 @@ public class KompasFragment extends Fragment implements SensorEventListener {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        // =====================================================================
-        //  LANGKAH 2: Cek Izin Sebelum Melakukan Apapun
-        // =====================================================================
+
+
         if (ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
-            // Izin sudah ada (misal: pengguna sudah setuju sebelumnya)
-            // Langsung jalankan kompas
+
+
             initializeKompas();
         } else {
-            // Izin belum ada, MINTA ke pengguna
+
             requestPermissionLauncher.launch(new String[]{
                     Manifest.permission.ACCESS_FINE_LOCATION,
                     Manifest.permission.ACCESS_COARSE_LOCATION
             });
         }
-        // =====================================================================
+
     }
 
-    // =====================================================================
-    //  LANGKAH 3: Buat Fungsi Inisialisasi
-    //  (Pindahkan semua logika dari onViewCreated lama ke sini)
-    // =====================================================================
+
+
+
     private void initializeKompas() {
-        // Pastikan konteks masih ada
+
         if (getContext() == null) return;
 
-        // Setup SensorManager
         sensorManager = (SensorManager) requireContext().getSystemService(Context.SENSOR_SERVICE);
         if (sensorManager != null) {
             accelerometer = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
             magnetometer = sensorManager.getDefaultSensor(Sensor.TYPE_MAGNETIC_FIELD);
         }
 
-        // Daftarkan sensor (pindahkan dari onResume ke sini agar lebih aman)
         if (accelerometer != null) {
             sensorManager.registerListener(this, accelerometer, SensorManager.SENSOR_DELAY_GAME);
         }
@@ -135,10 +128,8 @@ public class KompasFragment extends Fragment implements SensorEventListener {
 
         kompasRose = new KompasRose(requireContext());
 
-        // PENTING: getlocation() sekarang aman dipanggil karena izin sudah ada
         getlocation();
 
-        // Jalankan pencarian alamat di background thread
         ExecutorService executor = Executors.newSingleThreadExecutor();
         Handler handler = new Handler(Looper.getMainLooper());
         executor.execute(() -> {
@@ -157,7 +148,7 @@ public class KompasFragment extends Fragment implements SensorEventListener {
         }
         kompasRose.invalidate();
     }
-    // =====================================================================
+
 
     protected double bearing(double startLat, double startLng, double endLat, double endLng) {
         double longitude1 = startLng;
@@ -171,7 +162,7 @@ public class KompasFragment extends Fragment implements SensorEventListener {
     }
 
     public String getAddress(double lat, double lng) {
-        // Cek jika Geocoder tidak ada atau konteks null
+
         if (getContext() == null || !Geocoder.isPresent()) {
             return "Layanan Geocoder tidak tersedia";
         }
@@ -190,7 +181,7 @@ public class KompasFragment extends Fragment implements SensorEventListener {
                 }
             }
         } catch (IOException | IndexOutOfBoundsException | IllegalArgumentException e) {
-            // IllegalArgumentException ditambahkan untuk kasus lat/lng = 0.0
+
             e.printStackTrace();
             add = "Gagal memuat lokasi";
         }
@@ -202,23 +193,21 @@ public class KompasFragment extends Fragment implements SensorEventListener {
 
         gps = new KompasGPSTracker(requireContext());
 
-        // 1. Cek dulu apakah provider (GPS/Network) aktif
         if (gps.canGetLocation()) {
 
-            // 2. Jika ya, BARU panggil getLocation() (yang sudah aman dari sisi izin)
             Location loc = gps.getLocation();
 
             if (loc != null) {
                 latitude = loc.getLatitude();
                 longitude = loc.getLongitude();
             } else {
-                // Gagal mendapatkan lokasi, mungkin GPS masih mencari
+
                 latitude = 0.0; // Set default agar tidak crash
                 longitude = 0.0;
                 Toast.makeText(requireContext(), "Gagal mendapatkan lokasi terakhir, sedang mencari...", Toast.LENGTH_SHORT).show();
             }
         } else {
-            // 3. Jika provider mati, minta pengguna menyalakan
+
             gps.showSettingsAlert();
         }
     }
@@ -226,14 +215,14 @@ public class KompasFragment extends Fragment implements SensorEventListener {
     @Override
     public void onResume() {
         super.onResume();
-        // Logika sensor dipindahkan ke initializeKompas() agar hanya berjalan
-        // SETELAH izin diberikan.
+
+
     }
 
     @Override
     public void onPause() {
         super.onPause();
-        // Unregister listener
+
         if (sensorManager != null) {
             sensorManager.unregisterListener(this, accelerometer);
             sensorManager.unregisterListener(this, magnetometer);
@@ -270,7 +259,7 @@ public class KompasFragment extends Fragment implements SensorEventListener {
 
     @Override
     public void onAccuracyChanged(Sensor sensor, int accuracy) {
-        // Tidak perlu diisi
+
     }
 
     @Override

@@ -110,20 +110,20 @@ public class JSONHelper {
     public static ArrayList<DoaShalat> extractDoaShalat(){
         ArrayList<DoaShalat> arrayListDoaShalat = new ArrayList<>();
         try {
-            // -------------------------------------------------------------------------------------
+
             JSONObject root = new JSONObject(BASE_JSON_REPSONSE);
             JSONArray arrayDoaShalat = root.getJSONArray("doa_shalat");
-            // -------------------------------------------------------------------------------------
+
             for (int i = 0 ; i < arrayDoaShalat.length() ; i++){
                 JSONObject mDoaShalat = arrayDoaShalat.getJSONObject(i);
-                // ---------------------------------------------------------------------------------
+
                 String arabDoa = mDoaShalat.getString("bacaan");
                 String latin = mDoaShalat.getString("latin");
                 String arti = mDoaShalat.getString("arti");
-                // ---------------------------------------------------------------------------------
+
                 DoaShalat doaShalat = new DoaShalat(arabDoa,latin,arti);
                 arrayListDoaShalat.add(doaShalat);
-                // ---------------------------------------------------------------------------------
+
             }
 
         }catch (Exception e){
@@ -137,22 +137,22 @@ public class JSONHelper {
     public static ArrayList<NiatShalat> extractNiatShalat(){
         ArrayList<NiatShalat> arrayListNiatShalat = new ArrayList<>();
         try {
-            // -------------------------------------------------------------------------------------
+
             JSONObject root = new JSONObject(BASE_JSON_REPSONSE);
             JSONArray arrayNiatShalat = root.getJSONArray("niat_shalat");
-            // -------------------------------------------------------------------------------------
+
             for (int i= 0 ; i<arrayNiatShalat.length();i++){
                 JSONObject mNiatShalat = arrayNiatShalat.getJSONObject(i);
-                // ---------------------------------------------------------------------------------
+
                 String niat = mNiatShalat.getString("niat");
                 String arabDoa = mNiatShalat.getString("bacaan");
                 String rakaat = mNiatShalat.getString("rakaat");
                 String latin = mNiatShalat.getString("latin");
                 String arti = mNiatShalat.getString("arti");
-                // ---------------------------------------------------------------------------------
+
                 NiatShalat niatShalat = new NiatShalat(rakaat,niat,arabDoa,latin,arti);
                 arrayListNiatShalat.add(niatShalat);
-                // ---------------------------------------------------------------------------------
+
             }
 
         }catch (Exception e){

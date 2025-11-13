@@ -39,9 +39,8 @@ public class MainPagerAdapter extends FragmentStateAdapter {
         }
     }
 
-    // GANTI getCount() MENJADI getItemCount()
     @Override
     public int getItemCount() {
-        return 6; // Kembalikan jumlah tab Anda secara langsung
+        return 6;
     }
 }

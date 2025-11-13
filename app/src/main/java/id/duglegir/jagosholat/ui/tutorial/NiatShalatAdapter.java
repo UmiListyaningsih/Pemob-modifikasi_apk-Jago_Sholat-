@@ -12,9 +12,7 @@ import java.util.ArrayList;
 import id.duglegir.jagosholat.R;
 import id.duglegir.jagosholat.model.NiatShalat;
 
-/**
- * Created by Bryan on 3/3/2018.
- */
+
 
 public class NiatShalatAdapter extends ArrayAdapter<NiatShalat> {
 
@@ -33,21 +31,20 @@ public class NiatShalatAdapter extends ArrayAdapter<NiatShalat> {
 
 
         NiatShalat niat = getItem(position);
-        // -----------------------------------------------------------------------------------------
+
         TextView txt_rakaat = (TextView)listItemView.findViewById(R.id.text_rakaat);
         TextView txt_shalat = (TextView)listItemView.findViewById(R.id.text_shalat);
         TextView txt_arab = (TextView)listItemView.findViewById(R.id.text_arab);
         TextView txt_latin = (TextView)listItemView.findViewById(R.id.text_latin_arab);
         TextView txt_terjemah = (TextView)listItemView.findViewById(R.id.text_artinya);
-        // -----------------------------------------------------------------------------------------
 
-        // -----------------------------------------------------------------------------------------
+
         txt_rakaat.setText(niat.getRakaat());
         txt_shalat.setText(niat.getShalat());
         txt_arab.setText(niat.getArab());
         txt_latin.setText(niat.getLatin());
         txt_terjemah.setText(niat.getTerjemah());
-        // -----------------------------------------------------------------------------------------
+
 
         return listItemView;
     }

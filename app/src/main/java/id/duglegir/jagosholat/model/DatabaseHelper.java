@@ -1,8 +1,6 @@
 package id.duglegir.jagosholat.model;
 
-/*
- * Created by Ikhsan Ramadhan on 11/03/2018.
- */
+
 
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
@@ -12,22 +10,19 @@ import id.duglegir.jagosholat.model.DataContract.DataEntry;
 
 public class DatabaseHelper extends SQLiteOpenHelper {
 
-    // Deklarasi Nama Database dan Versinya --------------------------------------------------------
     private static final String DATABASE = "jagosholat.db";
     private static final int DATABASE_VERSION = 1;
-    // ---------------------------------------------------------------------------------------------
 
-    // Variable ini gunanya adalah untuk mendapatkan fungsi dari library SQLiteDatabase ------------
+
     private SQLiteDatabase sqLiteDatabase = getWritableDatabase();
-    // ada dua macam, "WriteableDatabase" dan "ReadableDatabase"
-    // ---------------------------------------------------------------------------------------------
+
+
 
     public DatabaseHelper(Context context) {
         super(context, DATABASE, null, DATABASE_VERSION);
         onCreate(sqLiteDatabase);
     }
 
-    // Disini Code Untuk Create Table di database SQLite -------------------------------------------
     @Override
     public void onCreate(SQLiteDatabase db) {
         try {
@@ -44,15 +39,14 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             e.printStackTrace();
         }
     }
-    // ---------------------------------------------------------------------------------------------
 
-    // Untuk mengupgrade table ---------------------------------------------------------------------
+
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
         String sql_drop_table = "DROP TABLE IF EXISTS " + DataEntry.TABLE_NAME;
         db.execSQL(sql_drop_table);
         onCreate(db);
     }
-    // ---------------------------------------------------------------------------------------------
+
 
 }

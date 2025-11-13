@@ -13,42 +13,24 @@ import android.util.Log;
 
 import id.duglegir.jagosholat.model.DataContract.DataEntry;
 
-/**
- * Created by Faisal Amir
- * FrogoBox Inc License
- * =========================================
- * JagoSholat
- * Copyright (C) 30/03/2018.
- * All rights reserved
- * -----------------------------------------
- * Name     : Muhammad Faisal Amir
- * E-mail   : f.miir117@gmail.com
- * Line     : bullbee117
- * Phone    : 081357108568
- * Majors   : D3 Teknik Informatika 2016
- * Campus   : Telkom University
- * -----------------------------------------
- * id.amirisback.frogobox
- */
+
 
 public class DataProvider extends ContentProvider {
 
-    // ---------------------------------------------------------------------------------------------
-    // Deklarasi Kebutuhan Variable
-    // Setiap Table memiliki alamat sendiri
+
+
     public static final String LOG_TAG = DataProvider.class.getSimpleName();
     private static final int DATA = 100; // Projection All
     private static final int DATA_ID = 101; // Projection ID
     private static final UriMatcher sUriMatcher = new UriMatcher(UriMatcher.NO_MATCH);
     private DatabaseHelper mDbHelper;
-    // ---------------------------------------------------------------------------------------------
 
-    // ---------------------------------------------------------------------------------------------
+
     static {
         sUriMatcher.addURI(DataContract.CONTENT_AUTHORITY, DataContract.PATH_DATA, DATA);
         sUriMatcher.addURI(DataContract.CONTENT_AUTHORITY, DataContract.PATH_DATA + "/#", DATA_ID);
     }
-    // ---------------------------------------------------------------------------------------------
+
 
     @Override
     public boolean onCreate() {
@@ -62,7 +44,6 @@ public class DataProvider extends ContentProvider {
             SQLiteDatabase database = mDbHelper.getReadableDatabase(); // Get readable database
             Cursor cursor; // This cursor will hold the result of the query
 
-            // Figure out if the URI matcher can match the URI to a specific code
             int match = sUriMatcher.match(uri);
             switch (match) {
                 case DATA:

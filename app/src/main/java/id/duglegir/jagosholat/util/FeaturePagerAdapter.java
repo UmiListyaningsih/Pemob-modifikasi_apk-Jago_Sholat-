@@ -1,13 +1,10 @@
 package id.duglegir.jagosholat.util;
 
 import android.content.Context;
-import androidx.annotation.NonNull; // Import baru
+import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
-// import androidx.fragment.app.FragmentPagerAdapter; // HAPUS IMPORT LAMA
-import androidx.viewpager2.adapter.FragmentStateAdapter; // <-- IMPORT BARU
-
-// Import semua fragment Anda
+import androidx.viewpager2.adapter.FragmentStateAdapter;
 import id.duglegir.jagosholat.ui.tutorial.FeatureWudhuFragment;
 import id.duglegir.jagosholat.ui.tutorial.FeatureNiatFragment;
 import id.duglegir.jagosholat.ui.tutorial.FeatureShalatFragment;
@@ -15,18 +12,16 @@ import id.duglegir.jagosholat.ui.tutorial.FeatureDoaFragment;
 import id.duglegir.jagosholat.R;
 
 
-public class FeaturePagerAdapter extends FragmentStateAdapter { // <-- GANTI EXTENDS
+public class FeaturePagerAdapter extends FragmentStateAdapter {
 
     private Context mContext;
 
-    // 1. BUAT CONSTRUCTOR BARU (menerima Fragment)
-    // Constructor lama (HAPUS): public FeaturePagerAdapter(Context context, FragmentManager fm ) { ... }
+
     public FeaturePagerAdapter(Fragment fragment, Context context) {
         super(fragment);
         mContext = context;
     }
 
-    // 2. GANTI getItem() menjadi createFragment()
     @NonNull
     @Override
     public Fragment createFragment(int position) {
@@ -40,15 +35,14 @@ public class FeaturePagerAdapter extends FragmentStateAdapter { // <-- GANTI EXT
             case 3 :
                 return new FeatureDoaFragment();
             default:
-                // Seharusnya tidak pernah terjadi, tapi aman untuk memiliki fallback
+
                 return new Fragment();
         }
     }
 
-    // 3. GANTI getCount() menjadi getItemCount()
     @Override
     public int getItemCount() {
-        return 4; // Jumlah total tab Anda
+        return 4;
     }
 
     public CharSequence getPageTitle(int position) {

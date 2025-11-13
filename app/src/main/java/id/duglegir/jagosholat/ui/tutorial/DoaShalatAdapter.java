@@ -12,9 +12,7 @@ import java.util.ArrayList;
 import id.duglegir.jagosholat.R;
 import id.duglegir.jagosholat.model.DoaShalat;
 
-/**
- * Created by Bryan on 3/12/2018.
- */
+
 
 public class DoaShalatAdapter extends ArrayAdapter<DoaShalat> {
 
@@ -33,17 +31,15 @@ public class DoaShalatAdapter extends ArrayAdapter<DoaShalat> {
 
         DoaShalat doaShalat = getItem(position);
 
-        // -----------------------------------------------------------------------------------------
         TextView txt_arab_doa = (TextView)listItemView.findViewById(R.id.arabDoaSetelah);
         TextView txt_latin_doa = (TextView)listItemView.findViewById(R.id.latinDoaSetelah);
         TextView txt_terjemah_doa = (TextView)listItemView.findViewById(R.id.terjemahDoaSetelah);
-        // -----------------------------------------------------------------------------------------
 
-        // -----------------------------------------------------------------------------------------
+
         txt_arab_doa.setText(doaShalat.getArabDoa());
         txt_latin_doa.setText(doaShalat.getLatinDoa());
         txt_terjemah_doa.setText(doaShalat.getTerjemahDoa());
-        // -----------------------------------------------------------------------------------------
+
 
         return listItemView;
     }

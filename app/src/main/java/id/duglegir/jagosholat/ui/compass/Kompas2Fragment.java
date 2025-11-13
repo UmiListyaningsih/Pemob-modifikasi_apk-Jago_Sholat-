@@ -56,33 +56,30 @@ public class Kompas2Fragment extends Fragment implements SensorEventListener {
     private double kaabaLat = 21.4225;
     private double kaabaLng = 39.8262;
 
-    // Launcher untuk meminta izin
-    // Launcher untuk meminta izin
+
     private final ActivityResultLauncher<String[]> requestPermissionLauncher =
             registerForActivityResult(new ActivityResultContracts.RequestMultiplePermissions(), (Map<String, Boolean> isGrantedMap) -> {
 
-                // --- PERBAIKAN 1: Cara lama yang kompatibel (menggantikan getOrDefault) ---
                 Boolean fineGranted = isGrantedMap.get(Manifest.permission.ACCESS_FINE_LOCATION);
                 Boolean coarseGranted = isGrantedMap.get(Manifest.permission.ACCESS_COARSE_LOCATION);
 
                 boolean fineLocationGranted = (fineGranted != null && fineGranted);
                 boolean coarseLocationGranted = (coarseGranted != null && coarseGranted);
-                // -------------------------------------------------------------------
 
-                // --- PERBAIKAN 2: Logika yang benar (gunakan ATAU ||) ---
-                // Cukup salah satu izin diberikan (FINE atau COARSE)
+
+
                 if (fineLocationGranted || coarseLocationGranted) {
-                    // Izin DIBERIKAN
+
                     startGpsSearch();
                 } else {
-                    // Izin DITOLAK
+
                     Toast.makeText(requireContext(), "Izin lokasi ditolak. Kompas tidak dapat berfungsi.", Toast.LENGTH_LONG).show();
                     if (binding != null) binding.tvLokasi.setText("Izin lokasi ditolak");
                 }
             });
 
     public Kompas2Fragment() {
-        // Required empty public constructor
+
     }
 
     @Override
@@ -96,7 +93,6 @@ public class Kompas2Fragment extends Fragment implements SensorEventListener {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        // 1. Inisialisasi semua
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(requireActivity());
         sensorManager = (SensorManager) requireContext().getSystemService(Context.SENSOR_SERVICE);
         if (sensorManager != null) {
@@ -104,19 +100,17 @@ public class Kompas2Fragment extends Fragment implements SensorEventListener {
             magnetometer = sensorManager.getDefaultSensor(Sensor.TYPE_MAGNETIC_FIELD);
         }
 
-        // 2. Buat KompasView DULU (ini perbaikan crash)
         kompasView = new Kompas2View(requireContext());
         binding.kompasContainer.addView(kompasView);
 
-        // 3. Mulai proses (Cek Izin GPS)
         checkAndRequestPermissions();
     }
 
     private void checkAndRequestPermissions() {
         if (ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
-            startGpsSearch(); // Izin sudah ada, cari GPS
+            startGpsSearch();
         } else {
-            // Izin belum ada, Minta
+
             requestPermissionLauncher.launch(new String[]{
                     Manifest.permission.ACCESS_FINE_LOCATION,
                     Manifest.permission.ACCESS_COARSE_LOCATION
@@ -124,9 +118,8 @@ public class Kompas2Fragment extends Fragment implements SensorEventListener {
         }
     }
 
-    // Fungsi ini HANYA mencari GPS
     private void startGpsSearch() {
-        // Cek izin (double check)
+
         if (ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED &&
                 ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             return;
@@ -158,7 +151,6 @@ public class Kompas2Fragment extends Fragment implements SensorEventListener {
 
         derajatKiblat = (float) bearing(userLat, userLng, kaabaLat, kaabaLng);
 
-        // Update View Kompas (ini sekarang aman)
         kompasView.updateDerajatKiblat(derajatKiblat);
         binding.tvDerajat.setText(String.format(Locale.getDefault(), "Kiblat: %.0f°", derajatKiblat));
 
@@ -175,7 +167,7 @@ public class Kompas2Fragment extends Fragment implements SensorEventListener {
     }
 
     private void loadAddress(double lat, double lng) {
-        // ... (Fungsi loadAddress Anda sudah benar, tidak perlu diubah) ...
+
         ExecutorService executor = Executors.newSingleThreadExecutor();
         Handler handler = new Handler(Looper.getMainLooper());
         executor.execute(() -> {
@@ -204,14 +196,13 @@ public class Kompas2Fragment extends Fragment implements SensorEventListener {
         });
     }
 
-    // =====================================================================
-    // PERBAIKAN SIKLUS HIDUP (LIFECYCLE) SENSOR
-    // =====================================================================
+
+
 
     @Override
     public void onResume() {
         super.onResume();
-        // Nyalakan sensor HANYA saat fragment terlihat
+
         if (sensorManager != null) {
             if (accelerometer != null) {
                 sensorManager.registerListener(this, accelerometer, SensorManager.SENSOR_DELAY_GAME);
@@ -225,7 +216,7 @@ public class Kompas2Fragment extends Fragment implements SensorEventListener {
     @Override
     public void onPause() {
         super.onPause();
-        // Matikan sensor saat fragment tidak terlihat (mencegah boros baterai)
+
         if (sensorManager != null) {
             sensorManager.unregisterListener(this, accelerometer);
             sensorManager.unregisterListener(this, magnetometer);
@@ -255,22 +246,21 @@ public class Kompas2Fragment extends Fragment implements SensorEventListener {
             azimuth = (float) Math.toDegrees(orientation[0]);
             azimuth = (azimuth + 360) % 360;
 
-            // --- JARING PENGAMAN (INI WAJIB ADA) ---
             if (kompasView != null) {
                 kompasView.updateAzimuth(azimuth);
             }
-            // ------------------------------------
+
         }
     }
 
     @Override
     public void onAccuracyChanged(Sensor sensor, int accuracy) {
-        // Tidak perlu diisi
+
     }
 
     @Override
     public void onDestroyView() {
         super.onDestroyView();
-        binding = null; // Wajib!
+        binding = null;
     }
 }

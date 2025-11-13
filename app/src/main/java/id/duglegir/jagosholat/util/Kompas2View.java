@@ -1,4 +1,4 @@
-package id.duglegir.jagosholat.util; // (Pastikan package ini benar)
+package id.duglegir.jagosholat.util;
 
 import android.content.Context;
 import android.graphics.Canvas;
@@ -7,7 +7,6 @@ import android.graphics.Paint;
 import android.graphics.Path;
 import android.util.AttributeSet;
 import android.view.View;
-
 import androidx.annotation.Nullable;
 
 public class Kompas2View extends View {
@@ -15,8 +14,8 @@ public class Kompas2View extends View {
     private Paint paint;
     private Path jarumKiblatPath;
 
-    private float azimuth = 0f; // Arah hadap HP (Utara)
-    private float derajatKiblat = 0f; // Arah Kiblat
+    private float azimuth = 0f;
+    private float derajatKiblat = 0f;
 
     private int lebar, tinggi;
 
@@ -36,7 +35,6 @@ public class Kompas2View extends View {
         paint.setStrokeWidth(4);
         paint.setColor(Color.GRAY);
 
-        // Membuat bentuk jarum kiblat (segitiga)
         jarumKiblatPath = new Path();
     }
 
@@ -55,14 +53,12 @@ public class Kompas2View extends View {
         int cy = tinggi / 2;
         int radius = Math.min(cx, cy) - 20;
 
-        // --- 1. Gambar Lingkaran Kompas ---
         paint.setColor(Color.GRAY);
         paint.setStyle(Paint.Style.STROKE);
         paint.setStrokeWidth(4);
         canvas.drawCircle(cx, cy, radius, paint);
 
-        // --- 2. Gambar Mata Angin (Berdasarkan Azimuth/Utara) ---
-        // (Kanvas diputar berlawanan arah hadap HP, agar 'U' selalu di atas)
+
         canvas.save();
         canvas.rotate(-azimuth, cx, cy);
 
@@ -76,40 +72,35 @@ public class Kompas2View extends View {
         canvas.drawText("B", cx - radius + 20, cy + (paint.getTextSize() / 3), paint);
         canvas.drawText("T", cx + radius - 50, cy + (paint.getTextSize() / 3), paint);
 
-        canvas.restore(); // Kembalikan kanvas ke posisi 0
+        canvas.restore();
 
-        // --- 3. Gambar Jarum Kiblat (Berdasarkan Arah Kiblat Relatif) ---
-        // Arah jarum = (Arah Kiblat - Arah Hadap HP)
+
         canvas.save();
         canvas.rotate(derajatKiblat - azimuth, cx, cy);
 
-        // Set path (bentuk jarum, menunjuk ke 'atas' relatif)
         jarumKiblatPath.reset();
-        jarumKiblatPath.moveTo(cx, cy - (radius * 0.8f)); // Puncak
-        jarumKiblatPath.lineTo(cx - 20, cy); // Kiri bawah
-        jarumKiblatPath.lineTo(cx + 20, cy); // Kanan bawah
+        jarumKiblatPath.moveTo(cx, cy - (radius * 0.8f));
+        jarumKiblatPath.lineTo(cx - 20, cy);
+        jarumKiblatPath.lineTo(cx + 20, cy);
         jarumKiblatPath.close();
 
-        paint.setColor(Color.parseColor("#FF009688")); // Hijau Tosca
+        paint.setColor(Color.parseColor("#FF009688"));
         paint.setStyle(Paint.Style.FILL);
         canvas.drawPath(jarumKiblatPath, paint);
 
         canvas.restore(); // Kembalikan kanvas
 
-        // --- 4. Gambar Titik Tengah ---
         paint.setColor(Color.RED);
         canvas.drawCircle(cx, cy, 10, paint);
     }
 
-    // Dipanggil dari Sensor HP
     public void updateAzimuth(float azimuth) {
         this.azimuth = azimuth;
-        invalidate(); // Minta view untuk menggambar ulang
+        invalidate();
     }
 
-    // Dipanggil setelah GPS dapat lokasi
     public void updateDerajatKiblat(float derajatKiblat) {
         this.derajatKiblat = derajatKiblat;
-        invalidate(); // Minta view untuk menggambar ulang
+        invalidate();
     }
 }
