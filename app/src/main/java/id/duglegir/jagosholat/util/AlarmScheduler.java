@@ -1,5 +1,6 @@
 package id.duglegir.jagosholat.util; // Pastikan package Anda benar
 
+import android.annotation.SuppressLint;
 import android.app.AlarmManager;
 import android.app.PendingIntent;
 import android.content.Context;
@@ -38,6 +39,7 @@ public class AlarmScheduler {
     }
 
 
+    @SuppressLint("NewApi")
     private static void schedulePrayerAlarm(Context context, String prayerName) {
         AlarmManager alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
 
@@ -86,45 +88,37 @@ public class AlarmScheduler {
         }
     }
 
-    // Fungsi "INTI" untuk mengubah "04:30" menjadi milidetik
     private static long getPrayerTimeInMillis(String prayerName) {
         return getPrayerTimeInMillis(prayerName, false); // Default untuk hari ini
     }
 
     private static long getPrayerTimeInMillis(String prayerName, boolean isForTomorrow) {
-        // === GANTI KODE DI BAWAH INI DENGAN JADWAL HELPER ANDA ===
-        // Saya hanya berasumsi, sesuaikan dengan kode Anda
-        String timeString = "00:00";
+        JadwalHelper helper = new JadwalHelper();
+        int totalSeconds;
 
-        // JadwalHelper jadwalHelper = new JadwalHelper(context); // Mungkin perlu context?
-        // switch (prayerName) {
-        //     case "Subuh": timeString = jadwalHelper.getWaktuSubuh(); break; // misal: "04:30"
-        //     case "Dzuhur": timeString = jadwalHelper.getWaktuDzuhur(); break; // misal: "11:45"
-        //     case "Ashar": timeString = jadwalHelper.getWaktuAshar(); break; // misal: "15:00"
-        //     case "Maghrib": timeString = jadwalHelper.getWaktuMaghrib(); break; // misal: "17:55"
-        //     case "Isya": timeString = jadwalHelper.getWaktuIsya(); break; // misal: "19:05"
-        // }
-
-        // --- HAPUS INI NANTI (HANYA UNTUK CONTOH) ---
+        // 2. Ambil waktu (dalam detik) dari getter publik Anda
         switch (prayerName) {
-            case "Subuh": timeString = "04:30"; break;
-            case "Dzuhur": timeString = "11:45"; break;
-            case "Ashar": timeString = "15:00"; break;
-            case "Maghrib": timeString = "17:55"; break;
-            case "Isya": timeString = "19:05"; break;
+            case "Subuh": totalSeconds = helper.getJmlWaktuShubuh(); break;
+            case "Dzuhur": totalSeconds = helper.getJmlWaktuDzuhur(); break;
+            case "Ashar": totalSeconds = helper.getJmlWaktuAshar(); break;
+            case "Maghrib": totalSeconds = helper.getJmlWaktuMaghrib(); break;
+            case "Isya": totalSeconds = helper.getJmlWaktuIsya(); break;
+            default: totalSeconds = 0;
         }
-        // --- HAPUS SAMPAI SINI ---
+        // =======================================================
 
-        // Parsing "HH:mm"
+        // Jika helper tidak mengembalikan waktu (misal: 0)
+        if (totalSeconds == 0) {
+            Log.e("AlarmScheduler", "Waktu sholat " + prayerName + " tidak ditemukan oleh JadwalHelper.");
+            return 0; // Waktu tidak valid
+        }
+
         try {
-            String[] parts = timeString.split(":");
-            int hour = Integer.parseInt(parts[0]);
-            int minute = Integer.parseInt(parts[1]);
-
+            // 3. Konversi total detik ke Objek Kalender
             Calendar calendar = Calendar.getInstance();
             calendar.setTimeInMillis(System.currentTimeMillis());
-            calendar.set(Calendar.HOUR_OF_DAY, hour);
-            calendar.set(Calendar.MINUTE, minute);
+            calendar.set(Calendar.HOUR_OF_DAY, totalSeconds / 3600); // 3600 detik/jam
+            calendar.set(Calendar.MINUTE, (totalSeconds % 3600) / 60); // sisa detik / 60
             calendar.set(Calendar.SECOND, 0);
             calendar.set(Calendar.MILLISECOND, 0);
 
@@ -144,6 +138,7 @@ public class AlarmScheduler {
             return 0; // Waktu tidak valid
         }
     }
+    // -----------------------------------------------------------------
 
     // Helper untuk ID unik PendingIntent
     private static int getRequestCode(String prayerName) {
