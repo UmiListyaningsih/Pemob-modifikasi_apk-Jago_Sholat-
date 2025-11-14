@@ -24,20 +24,20 @@
         <ImageButton
             android:id="@+id/btn_tasbih_reset_count"
             android:layout_width="0dp"
-            android:layout_height="48dp"
+            android:layout_height="70dp"
             android:layout_weight="1"
             android:background="?android:attr/selectableItemBackgroundBorderless"
-            android:src="@drawable/ic_baseline_refresh_24px"
-            android:contentDescription="Reset Hitungan Sekarang" />
+            android:contentDescription="Reset Hitungan Sekarang"
+            android:src="@drawable/ic_baseline_refresh_24px" />
 
         <ImageButton
             android:id="@+id/btn_tasbih_log"
             android:layout_width="0dp"
-            android:layout_height="48dp"
+            android:layout_height="70dp"
             android:layout_weight="1"
             android:background="?android:attr/selectableItemBackgroundBorderless"
-            android:src="@drawable/ic_baseline_add_24"
-            android:contentDescription="Tambah ke Total" />
+            android:contentDescription="Tambah ke Total"
+            android:src="@drawable/ic_baseline_add_24" />
     </LinearLayout>
 
     <ProgressBar
