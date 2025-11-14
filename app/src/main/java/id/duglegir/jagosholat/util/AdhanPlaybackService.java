@@ -1,4 +1,4 @@
-package id.duglegir.jagosholat.util; // Pastikan package Anda benar
+package id.duglegir.jagosholat.util;
 
 import android.app.Notification;
 import android.app.NotificationChannel;
