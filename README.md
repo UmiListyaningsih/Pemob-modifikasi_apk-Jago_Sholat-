@@ -9,6 +9,16 @@ Anggota : (Nama - NIM)
 
 Presentasi minggu ke : 13
 
-Updated gradle version.
-Add compass feature
-Add Notification Feature
+TELAH DI MODIFIKASI :
+- GRADLE VERSION
+- FITUR TASBIH DIGITAL
+- FITUR KOMPAS
+- NONTIFIKASI WAKTU SHOLAT
+- MENAMBAHKAN API LOKASI
+- REDESAIN FOTO DI BAGIAN TATA CARA
+
+  
+
+  POSTER JAGO SHOLAT KEL 5 :
+
+<img width="1080" height="1350" alt="Biru dan Putih Modern Layanan Aplikasi Seluler Instagram Post_20251217_224743_0000" src="https://github.com/user-attachments/assets/e690902d-58ac-49cf-bfac-dc2a34d05b42" />
