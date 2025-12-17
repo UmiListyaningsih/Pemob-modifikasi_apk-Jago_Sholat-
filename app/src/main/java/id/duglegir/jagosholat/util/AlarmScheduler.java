@@ -81,10 +81,12 @@ public class AlarmScheduler {
     private static long getPrayerTimeInMillis(Context context, String prayerName, boolean isForTomorrow) {
         String timeString = PrayerTimeStorage.getPrayerTime(context, prayerName);
 
+
         if (timeString.equals("00:00")) {
             Log.e("AlarmScheduler", "Waktu sholat " + prayerName + " tidak ditemukan di Storage.");
             return 0;
         }
+        
 
         try {
             String[] parts = timeString.split(":");

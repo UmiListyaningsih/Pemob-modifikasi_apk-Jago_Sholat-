@@ -3,14 +3,13 @@ package id.duglegir.jagosholat.ui.main;
 import android.Manifest;
 import android.content.Context;
 import android.content.pm.PackageManager;
-import android.location.Address; // <-- Import baru
-import android.location.Geocoder; // <-- Import baru
+import android.location.Address;
+import android.location.Geocoder;
 import android.location.Location;
 import android.os.Bundle;
-import android.os.CountDownTimer; // <-- Import baru
-import android.os.Handler; // <-- Import baru
-import android.os.Looper; // <-- Import baru
-import android.util.Log;
+import android.os.CountDownTimer;
+import android.os.Handler;
+import android.os.Looper;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -32,64 +31,80 @@ import com.google.android.gms.location.LocationServices;
 
 import org.json.JSONObject;
 
-import java.io.IOException; // <-- Import baru
-import java.util.ArrayList; // <-- Import baru
-import java.util.Calendar; // <-- Import baru
-import java.util.Collections; // <-- Import baru
-import java.util.List; // <-- Import baru
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-import java.util.concurrent.ExecutorService; // <-- Import baru
-import java.util.concurrent.Executors; // <-- Import baru
-import java.util.concurrent.TimeUnit; // <-- Import baru
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 
 import id.duglegir.jagosholat.databinding.FragmentJadwalBinding;
-import id.duglegir.jagosholat.util.AlarmScheduler; // <-- Import helper alarm
+import id.duglegir.jagosholat.util.AlarmScheduler;
 import id.duglegir.jagosholat.util.PrayerTimeStorage;
 
 public class JadwalFragment extends Fragment {
 
+    // ================= FIX UTAMA =================
     private FragmentJadwalBinding binding;
     private FusedLocationProviderClient fusedLocationClient;
-    private RequestQueue volleyQueue;
+    // =============================================
 
+    private RequestQueue volleyQueue;
     private ExecutorService executor;
     private Handler handler;
-
     private CountDownTimer countDownTimer;
-    private static final String[] PRAYER_NAMES = {"Subuh", "Dzuhur", "Ashar", "Maghrib", "Isya"};
+
+    private static final String[] PRAYER_NAMES = {
+            "Subuh", "Dzuhur", "Ashar", "Maghrib", "Isya"
+    };
     private static final String FORMAT_COUNTDOWN = "%02d:%02d:%02d";
 
     private final ActivityResultLauncher<String[]> requestPermissionLauncher =
-            registerForActivityResult(new ActivityResultContracts.RequestMultiplePermissions(), (Map<String, Boolean> isGrantedMap) -> {
-                Boolean fineGranted = isGrantedMap.get(Manifest.permission.ACCESS_FINE_LOCATION);
-                Boolean coarseGranted = isGrantedMap.get(Manifest.permission.ACCESS_COARSE_LOCATION);
+            registerForActivityResult(
+                    new ActivityResultContracts.RequestMultiplePermissions(),
+                    (Map<String, Boolean> result) -> {
 
-                if ((fineGranted != null && fineGranted) || (coarseGranted != null && coarseGranted)) {
-                    startGpsFetch();
-                } else {
-                    Toast.makeText(requireContext(), "Izin lokasi ditolak.", Toast.LENGTH_LONG).show();
-                }
-            });
+                        Boolean fine = result.get(Manifest.permission.ACCESS_FINE_LOCATION);
+                        Boolean coarse = result.get(Manifest.permission.ACCESS_COARSE_LOCATION);
+
+                        if ((fine != null && fine) || (coarse != null && coarse)) {
+                            startGpsFetch();
+                        } else {
+                            Toast.makeText(
+                                    requireContext(),
+                                    "Izin lokasi ditolak",
+                                    Toast.LENGTH_LONG
+                            ).show();
+                        }
+                    });
 
     public JadwalFragment() {
-        // Required empty public constructor
     }
 
     @Override
-    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
+    public View onCreateView(
+            @NonNull LayoutInflater inflater,
+            ViewGroup container,
+            Bundle savedInstanceState) {
+
         binding = FragmentJadwalBinding.inflate(inflater, container, false);
         return binding.getRoot();
     }
 
     @Override
-    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+    public void onViewCreated(
+            @NonNull View view,
+            @Nullable Bundle savedInstanceState) {
+
         super.onViewCreated(view, savedInstanceState);
 
-        fusedLocationClient = LocationServices.getFusedLocationProviderClient(requireActivity());
-        volleyQueue = Volley.newRequestQueue(requireContext());
+        fusedLocationClient =
+                LocationServices.getFusedLocationProviderClient(requireActivity());
 
+        volleyQueue = Volley.newRequestQueue(requireContext());
         executor = Executors.newSingleThreadExecutor();
         handler = new Handler(Looper.getMainLooper());
 
@@ -97,8 +112,13 @@ public class JadwalFragment extends Fragment {
     }
 
     private void checkAndRequestPermissions() {
-        if (ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+        if (ContextCompat.checkSelfPermission(
+                requireContext(),
+                Manifest.permission.ACCESS_FINE_LOCATION
+        ) == PackageManager.PERMISSION_GRANTED) {
+
             startGpsFetch();
+
         } else {
             requestPermissionLauncher.launch(new String[]{
                     Manifest.permission.ACCESS_FINE_LOCATION,
@@ -108,208 +128,192 @@ public class JadwalFragment extends Fragment {
     }
 
     private void startGpsFetch() {
-        if (ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED &&
-                ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+
+        if (ContextCompat.checkSelfPermission(
+                requireContext(),
+                Manifest.permission.ACCESS_FINE_LOCATION
+        ) != PackageManager.PERMISSION_GRANTED &&
+                ContextCompat.checkSelfPermission(
+                        requireContext(),
+                        Manifest.permission.ACCESS_COARSE_LOCATION
+                ) != PackageManager.PERMISSION_GRANTED) {
             return;
         }
 
-        binding.txtWaktuShubuh.setText("Mencari...");
+        binding.txtWaktuShubuh.setText("Mencari lokasi...");
+
         fusedLocationClient.getLastLocation()
-                .addOnSuccessListener(requireActivity(), location -> {
+                .addOnSuccessListener(location -> {
                     if (location != null) {
                         fetchPrayerTimesFromApi(location);
-
-                        loadAddress(location.getLatitude(), location.getLongitude());
-
+                        loadAddress(
+                                location.getLatitude(),
+                                location.getLongitude()
+                        );
                     } else {
-                        binding.txtWaktuShubuh.setText("Gagal mendapat lokasi");
+                        binding.txtWaktuShubuh.setText("Lokasi tidak ditemukan");
                     }
                 })
-                .addOnFailureListener(e -> {
-                    binding.txtWaktuShubuh.setText("Error: " + e.getMessage());
-                });
+                .addOnFailureListener(e ->
+                        binding.txtWaktuShubuh.setText("Error lokasi")
+                );
     }
 
     private void fetchPrayerTimesFromApi(Location location) {
-        double latitude = location.getLatitude();
-        double longitude = location.getLongitude();
 
-        String url = String.format(Locale.US,
+        double lat = location.getLatitude();
+        double lon = location.getLongitude();
+
+        String url = String.format(
+                Locale.US,
                 "https://api.aladhan.com/v1/timings?latitude=%.4f&longitude=%.4f&method=9",
-                latitude, longitude);
+                lat, lon
+        );
 
-        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest
-                (Request.Method.GET, url, null, response -> {
+        JsonObjectRequest request = new JsonObjectRequest(
+                Request.Method.GET,
+                url,
+                null,
+                response -> {
                     try {
-                        JSONObject timings = response.getJSONObject("data").getJSONObject("timings");
+                        JSONObject timings =
+                                response.getJSONObject("data")
+                                        .getJSONObject("timings");
 
-                        String fajr = timings.getString("Fajr");
-                        String dhuhr = timings.getString("Dhuhr");
-                        String asr = timings.getString("Asr");
+                        String subuh = timings.getString("Fajr");
+                        String dzuhur = timings.getString("Dhuhr");
+                        String ashar = timings.getString("Asr");
                         String maghrib = timings.getString("Maghrib");
-                        String isha = timings.getString("Isha");
+                        String isya = timings.getString("Isha");
 
-                        binding.txtWaktuShubuh.setText(fajr);
-                        binding.txtWaktuDzuhur.setText(dhuhr);
-                        binding.txtWaktuAshar.setText(asr);
+                        binding.txtWaktuShubuh.setText(subuh);
+                        binding.txtWaktuDzuhur.setText(dzuhur);
+                        binding.txtWaktuAshar.setText(ashar);
                         binding.txtWaktuMaghrib.setText(maghrib);
-                        binding.txtWaktuIsya.setText(isha);
+                        binding.txtWaktuIsya.setText(isya);
 
-                        Context context = requireContext();
-                        PrayerTimeStorage.savePrayerTime(context, "Subuh", fajr);
-                        PrayerTimeStorage.savePrayerTime(context, "Dzuhur", dhuhr);
-                        PrayerTimeStorage.savePrayerTime(context, "Ashar", asr);
-                        PrayerTimeStorage.savePrayerTime(context, "Maghrib", maghrib);
-                        PrayerTimeStorage.savePrayerTime(context, "Isya", isha);
+                        Context ctx = requireContext();
+                        PrayerTimeStorage.savePrayerTime(ctx, "Subuh", subuh);
+                        PrayerTimeStorage.savePrayerTime(ctx, "Dzuhur", dzuhur);
+                        PrayerTimeStorage.savePrayerTime(ctx, "Ashar", ashar);
+                        PrayerTimeStorage.savePrayerTime(ctx, "Maghrib", maghrib);
+                        PrayerTimeStorage.savePrayerTime(ctx, "Isya", isya);
 
-                        AlarmScheduler.scheduleAlarms(context);
-
+                        AlarmScheduler.scheduleAlarms(ctx);
                         calculateAndStartCountdown();
 
                     } catch (Exception e) {
-                        e.printStackTrace();
-                        binding.txtWaktuShubuh.setText("Error parsing JSON");
+                        binding.txtWaktuShubuh.setText("Gagal parsing data");
                     }
-                }, error -> {
-                    error.printStackTrace();
-                    binding.txtWaktuShubuh.setText("Gagal mengambil data");
-                });
+                },
+                error -> binding.txtWaktuShubuh.setText("Gagal ambil jadwal")
+        );
 
-        volleyQueue.add(jsonObjectRequest);
+        volleyQueue.add(request);
     }
 
-    private void loadAddress(double lat, double lng) {
+    private void loadAddress(double lat, double lon) {
         executor.execute(() -> {
-            String addressString = "Lokasi tidak diketahui";
+            String alamat = "Lokasi tidak diketahui";
+
             if (Geocoder.isPresent()) {
-                Geocoder geocoder = new Geocoder(requireContext(), Locale.getDefault());
+                Geocoder geocoder =
+                        new Geocoder(requireContext(), Locale.getDefault());
                 try {
-                    List<Address> addresses = geocoder.getFromLocation(lat, lng, 1);
-                    if (addresses != null && !addresses.isEmpty()) {
-                        Address obj = addresses.get(0);
-                        addressString = obj.getLocality();
-                        if (addressString == null) {
-                            addressString = obj.getSubAdminArea();
-                        }
+                    List<Address> list =
+                            geocoder.getFromLocation(lat, lon, 1);
+                    if (list != null && !list.isEmpty()) {
+                        Address a = list.get(0);
+                        alamat = a.getLocality() != null
+                                ? a.getLocality()
+                                : a.getSubAdminArea();
                     }
-                } catch (IOException e) {
-                    e.printStackTrace();
+                } catch (IOException ignored) {
                 }
             }
-            // Post ke UI thread
-            String finalAddressString = addressString;
+
+            String finalAlamat = alamat;
             handler.post(() -> {
                 if (binding != null) {
-                    binding.tvLokasi.setText(finalAddressString);
+                    binding.tvLokasi.setText(finalAlamat);
                 }
             });
         });
     }
 
-    private long getPrayerTimeInMillis(Context context, String prayerName) {
-        String timeString = PrayerTimeStorage.getPrayerTime(context, prayerName);
-        if (timeString.equals("00:00")) {
-            return 0; // Waktu tidak valid
-        }
+    private long getPrayerTimeInMillis(Context context, String name) {
+        String time = PrayerTimeStorage.getPrayerTime(context, name);
+        if (time.equals("00:00")) return 0;
 
         try {
-            String[] parts = timeString.split(":");
-            int hour = Integer.parseInt(parts[0]);
-            int minute = Integer.parseInt(parts[1]);
-
-            Calendar calendar = Calendar.getInstance();
-            calendar.setTimeInMillis(System.currentTimeMillis());
-            calendar.set(Calendar.HOUR_OF_DAY, hour);
-            calendar.set(Calendar.MINUTE, minute);
-            calendar.set(Calendar.SECOND, 0);
-            calendar.set(Calendar.MILLISECOND, 0);
-            return calendar.getTimeInMillis();
+            String[] p = time.split(":");
+            Calendar c = Calendar.getInstance();
+            c.set(Calendar.HOUR_OF_DAY, Integer.parseInt(p[0]));
+            c.set(Calendar.MINUTE, Integer.parseInt(p[1]));
+            c.set(Calendar.SECOND, 0);
+            return c.getTimeInMillis();
         } catch (Exception e) {
-            e.printStackTrace();
             return 0;
         }
     }
 
     private void calculateAndStartCountdown() {
-        if (getContext() == null) return;
 
         long now = System.currentTimeMillis();
-        ArrayList<Long> prayerTimesMillis = new ArrayList<>();
-        ArrayList<String> prayerNamesList = new ArrayList<>();
+        ArrayList<Long> times = new ArrayList<>();
+        ArrayList<String> names = new ArrayList<>();
 
-        for (String name : PRAYER_NAMES) {
-            long time = getPrayerTimeInMillis(requireContext(), name);
-            if (time > 0) {
-                prayerTimesMillis.add(time);
-                prayerNamesList.add(name);
+        for (String n : PRAYER_NAMES) {
+            long t = getPrayerTimeInMillis(requireContext(), n);
+            if (t > 0) {
+                times.add(t);
+                names.add(n);
             }
         }
 
-        for (int i = 0; i < prayerTimesMillis.size(); i++) {
-            long prayerTime = prayerTimesMillis.get(i);
-            if (prayerTime > now) {
-                long millisUntilFinished = prayerTime - now;
-                String nextPrayerName = prayerNamesList.get(i);
-
-                binding.txtViewSholat.setText(nextPrayerName);
-                startCountdownTimer(millisUntilFinished);
+        for (int i = 0; i < times.size(); i++) {
+            if (times.get(i) > now) {
+                binding.txtViewSholat.setText(names.get(i));
+                startCountdownTimer(times.get(i) - now);
                 return;
             }
         }
-
-        long tomorrowFajrMillis = getPrayerTimeInMillis(requireContext(), "Subuh");
-        if (tomorrowFajrMillis > 0) {
-            tomorrowFajrMillis += (24 * 60 * 60 * 1000);
-            long millisUntilFinished = tomorrowFajrMillis - now;
-
-            binding.txtViewSholat.setText("Subuh");
-            startCountdownTimer(millisUntilFinished);
-        }
     }
 
-    private void startCountdownTimer(long millisUntilFinished) {
-        if (countDownTimer != null) {
-            countDownTimer.cancel();
-        }
+    private void startCountdownTimer(long millis) {
 
-        countDownTimer = new CountDownTimer(millisUntilFinished, 1000) {
+        if (countDownTimer != null) countDownTimer.cancel();
+
+        countDownTimer = new CountDownTimer(millis, 1000) {
             @Override
-            public void onTick(long millisLeft) {
-                if (binding != null) {
-                    binding.countDown.setText("- " + String.format(FORMAT_COUNTDOWN,
-                            TimeUnit.MILLISECONDS.toHours(millisLeft),
-                            TimeUnit.MILLISECONDS.toMinutes(millisLeft) - TimeUnit.HOURS.toMinutes(TimeUnit.MILLISECONDS.toHours(millisLeft)),
-                            TimeUnit.MILLISECONDS.toSeconds(millisLeft) - TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS.toMinutes(millisLeft))
-                    ));
-                }
+            public void onTick(long m) {
+                binding.countDown.setText(
+                        "- " + String.format(
+                                FORMAT_COUNTDOWN,
+                                TimeUnit.MILLISECONDS.toHours(m),
+                                TimeUnit.MILLISECONDS.toMinutes(m) % 60,
+                                TimeUnit.MILLISECONDS.toSeconds(m) % 60
+                        )
+                );
             }
 
             @Override
             public void onFinish() {
-                if (binding != null) {
-                    binding.countDown.setText("00:00:00");
-                    binding.txtViewSholat.setText("Waktu Sholat Telah Tiba!");
-                }
-                new Handler(Looper.getMainLooper()).postDelayed(() -> calculateAndStartCountdown(), 2000);
+                binding.countDown.setText("00:00:00");
+                binding.txtViewSholat.setText("Waktu Sholat");
+                new Handler(Looper.getMainLooper())
+                        .postDelayed(
+                                JadwalFragment.this::calculateAndStartCountdown,
+                                2000
+                        );
             }
         }.start();
     }
 
     @Override
-    public void onStop() {
-        super.onStop();
-        if (countDownTimer != null) {
-            countDownTimer.cancel();
-            countDownTimer = null;
-        }
-    }
-
-    @Override
     public void onDestroyView() {
         super.onDestroyView();
+        if (countDownTimer != null) countDownTimer.cancel();
         binding = null;
-        if (countDownTimer != null) {
-            countDownTimer.cancel();
-        }
     }
 }
